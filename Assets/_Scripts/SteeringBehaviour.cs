@@ -2,6 +2,7 @@
 
 public abstract class SteeringBehaviour : MonoBehaviour
 {
+    public SOSteeringData data;
     protected Vehicle vehicle;
     public abstract Vector3 Steer();
 

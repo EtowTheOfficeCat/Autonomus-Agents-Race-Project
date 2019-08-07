@@ -13,15 +13,17 @@ public class Vehicle : MonoBehaviour
     {
         steeringBehaviours = GetComponents<SteeringBehaviour>();
     }
-        
-    public void ApplyForce(Vector3 force)
+
+    public void ApplyForce(Vector3 force, float weight)
     {
-        acceleration += force / Mass;
+        acceleration += (force * weight) / Mass;
+        acceleration = Vector3.ClampMagnitude(acceleration, MaxForce);
     }
 
     public void UpdateVehicle()
     {
         Velocity += acceleration * Time.deltaTime;
+        Velocity = Vector3.ClampMagnitude(Velocity, MaxSpeed);
         transform.position += Velocity * Time.deltaTime;
         acceleration = Vector3.zero;
     }
