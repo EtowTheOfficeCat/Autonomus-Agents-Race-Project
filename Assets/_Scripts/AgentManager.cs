@@ -3,6 +3,8 @@
 public class AgentManager : MonoBehaviour
 {
     public Vehicle[] vehicles;
+    public Obsticle[] Obsticles;
+    public Transform[] WayPoints;
 
     private void Start()
     {
@@ -13,6 +15,17 @@ public class AgentManager : MonoBehaviour
             {
                 sb.vehicles = this.vehicles;
             }
+            ObsticleAvoidBehavior oab = vehicle.GetComponent<ObsticleAvoidBehavior>();
+            if (oab!= null)
+            {
+                oab.Obsticles = Obsticles;
+            }
+            WayPointFollow wpf = vehicle.GetComponent<WayPointFollow>();
+            if(wpf != null)
+            {
+                wpf.WayPoints = WayPoints;
+                wpf.CurTarget = WayPoints[0];
+            }
         }
     }
 
@@ -21,6 +34,10 @@ public class AgentManager : MonoBehaviour
         for (int v = 0; v < vehicles.Length; v++)
         {
             Vehicle vehicle = vehicles[v];
+            if (!vehicle.isActiveAndEnabled)
+            {
+                continue;
+            }
             SteeringBehaviour[] steeringBehaviours = vehicle.steeringBehaviours;
             for (int sbIdx = 0; sbIdx < steeringBehaviours.Length; sbIdx++)
             {

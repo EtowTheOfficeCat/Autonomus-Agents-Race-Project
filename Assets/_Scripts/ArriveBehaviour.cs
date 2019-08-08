@@ -2,9 +2,12 @@
 
 public class ArriveBehaviour : SteeringBehaviour
 {
+    public float DecelerationTweaker = 30f;
     public float SlowDownDistance;
+    private float slowDownStartSpeed;
     private Transform target;
     private float t;
+    private bool isStartSpeedSet;
 
     public override void Awake()
     {
@@ -19,16 +22,22 @@ public class ArriveBehaviour : SteeringBehaviour
         float distanceToTarget = desired.magnitude;
         if (distanceToTarget < SlowDownDistance)
         {
+            if (!isStartSpeedSet)
+            {
+                slowDownStartSpeed = vehicle.Velocity.magnitude;
+                isStartSpeedSet = true;
+            }
             t = distanceToTarget / SlowDownDistance;
-            //desired = desired.normalized * t * vehicle.MaxSpeed;
-            float mappedSpeed = Mathf.Lerp(0f, vehicle.MaxSpeed, t);
+            float mappedSpeed = Mathf.Lerp(0f, slowDownStartSpeed, t);
+            mappedSpeed = mappedSpeed < 0.2f ? 0f : mappedSpeed;
             desired = desired.normalized * mappedSpeed;
-            //steer *= SlowDownDistance - distanceToTarget;
             steer = desired - vehicle.Velocity;
-            steer = Vector3.ClampMagnitude(steer, vehicle.MaxForce);
+            float decel = (1 - t * t * t) * DecelerationTweaker;
+            steer *= decel;
         }
         else
         {
+            isStartSpeedSet = false;
             desired = desired.normalized * vehicle.MaxSpeed;
             steer = desired - vehicle.Velocity;
             steer = Vector3.ClampMagnitude(steer, vehicle.MaxForce);
